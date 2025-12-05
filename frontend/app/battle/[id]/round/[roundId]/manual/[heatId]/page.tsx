@@ -5,13 +5,14 @@ import { fetchHeatDetail, fetchParticipants, fetchRound } from "../../../../../.
 import { formatRoundLabel } from "../../../../../../../lib/rounds";
 
 type EditHeatPageProps = {
-  params: { id: string; roundId: string; heatId: string };
+  params: Promise<{ id: string; roundId: string; heatId: string }>;
 };
 
 export default async function EditHeatPage({ params }: EditHeatPageProps) {
-  const competitionId = Number(params.id);
-  const roundId = Number(params.roundId);
-  const heatId = Number(params.heatId);
+  const { id, roundId: roundIdStr, heatId: heatIdStr } = await params;
+  const competitionId = Number(id);
+  const roundId = Number(roundIdStr);
+  const heatId = Number(heatIdStr);
 
   const [round, heatDetail] = await Promise.all([
     fetchRound(roundId),

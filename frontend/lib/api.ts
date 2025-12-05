@@ -116,6 +116,12 @@ export type Score = {
   score: number;
 };
 
+export type HeatDistributionResponse = {
+  status: string;
+  round_id: number;
+  heats_created: number;
+};
+
 const BACKEND_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
@@ -184,7 +190,7 @@ export async function fetchHeats(roundId: number): Promise<Heat[]> {
 }
 
 export async function distributeHeats(roundId: number, maxInHeat: number) {
-  return request(`/rounds/${roundId}/distribute`, {
+  return request<HeatDistributionResponse>(`/rounds/${roundId}/distribute`, {
     method: "POST",
     body: JSON.stringify({ max_in_heat: maxInHeat }),
   });

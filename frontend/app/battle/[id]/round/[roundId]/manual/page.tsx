@@ -5,12 +5,13 @@ import { fetchParticipants, fetchRound } from "../../../../../../lib/api";
 import { formatRoundLabel } from "../../../../../../lib/rounds";
 
 type ManualHeatPageProps = {
-  params: { id: string; roundId: string };
+  params: Promise<{ id: string; roundId: string }>;
 };
 
 export default async function ManualHeatPage({ params }: ManualHeatPageProps) {
-  const competitionId = Number(params.id);
-  const roundId = Number(params.roundId);
+  const { id, roundId: roundIdStr } = await params;
+  const competitionId = Number(id);
+  const roundId = Number(roundIdStr);
 
   const round = await fetchRound(roundId);
   const participants = await fetchParticipants(competitionId, round.category_id);

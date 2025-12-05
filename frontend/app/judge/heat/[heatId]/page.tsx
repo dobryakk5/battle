@@ -9,11 +9,12 @@ import { formatRoundLabel } from "../../../../lib/rounds";
 const DEFAULT_JUDGE_ID = Number(process.env.NEXT_PUBLIC_DEFAULT_JUDGE_ID ?? "1");
 
 type HeatPageProps = {
-  params: { heatId: string };
+  params: Promise<{ heatId: string }>;
 };
 
 export default async function HeatPage({ params }: HeatPageProps) {
-  const heatId = Number(params.heatId);
+  const { heatId: heatIdStr } = await params;
+  const heatId = Number(heatIdStr);
   const heat = await fetchHeatDetail(heatId);
   const scores = await fetchScoresForHeat(heat.id);
   const initialSubmitted = groupScoresByParticipant(

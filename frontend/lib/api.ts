@@ -122,10 +122,19 @@ export type HeatDistributionResponse = {
   heats_created: number;
 };
 
-const BACKEND_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api";
+// Server-side: используем прямой URL к backend
+// Client-side: используем относительный путь через Next.js rewrites
+const getBaseUrl = () => {
+  // Если код выполняется на сервере (Node.js)
+  if (typeof window === "undefined") {
+    return process.env.BACKEND_URL || "http://localhost:8000";
+  }
+  // Если код выполняется в браузере
+  return process.env.NEXT_PUBLIC_API_BASE_URL || "/api";
+};
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${BACKEND_BASE_URL}${path}`, {
+  const response = await fetch(`${getBaseUrl()}${path}`, {
     cache: "no-store",
     headers: {
       "Content-Type": "application/json",

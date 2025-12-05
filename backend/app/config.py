@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = str(Path(__file__).resolve().parents[1] / ".env")
         case_sensitive = False
+        extra = "ignore"  # Игнорировать неизвестные переменные окружения
 
 
 settings = Settings()

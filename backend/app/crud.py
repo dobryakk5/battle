@@ -135,6 +135,18 @@ async def list_participants(db: AsyncSession, category_id: int) -> List[models.P
     return result.scalars().all()
 
 
+async def list_all_participants_by_event(db: AsyncSession, event_id: int) -> List[models.Participant]:
+    """Get all participants for a competition across all categories."""
+    stmt = (
+        select(models.Participant)
+        .join(models.Category)
+        .filter(models.Category.event_id == event_id)
+        .order_by(models.Participant.number.asc().nullsfirst(), models.Participant.last_name)
+    )
+    result = await db.execute(stmt)
+    return result.scalars().all()
+
+
 async def get_participant(
     db: AsyncSession,
     participant_id: int,

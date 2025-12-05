@@ -30,7 +30,7 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```bash
 cd frontend
 npm install
-npm run dev    # runs on port 3000
+npm run dev    # runs on port 3003
 npm run build  # production build
 npm run lint   # ESLint check
 ```
@@ -46,7 +46,7 @@ python -m bot.main
 ### Directory Structure
 ```
 /battle
-├── frontend/          # Next.js app (port 3000)
+├── frontend/          # Next.js app (port 3003)
 │   ├── app/          # App Router pages (Server Components by default)
 │   ├── components/   # Reusable Client Components
 │   └── lib/api.ts    # Centralized API client with typed endpoints
@@ -135,7 +135,7 @@ See `Doc/heats_distribution.md` for detailed algorithm.
 ```
 DATABASE_URL=postgresql+asyncpg://postgres:password@localhost:5432/battle
 TELEGRAM_BOT_TOKEN=your-telegram-bot-token
-ADMIN_LINK_BASE=http://localhost:3000/admin
+ADMIN_LINK_BASE=http://localhost:3003/admin
 ```
 
 ### Frontend `.env`

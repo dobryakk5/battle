@@ -70,3 +70,7 @@ The bot pulls judges from `GET /users/me?telegram_id={id}` and shows top competi
 1. Wire authentication/permissions (JWT/Cookie + Telegram code) so judges/admins see only their data.
 2. Implement live updates (WebSocket or polling) on the frontend and export hooks for Excel/PDF.
 3. Add unit/integration tests for heat distribution, score aggregation, and bot handlers.
+
+
+kill api
+lsof -ti:8000

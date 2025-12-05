@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from .. import crud, models
 from ..database import get_db
-from ..schemas import CategoryCreate, CategoryRead, CompetitionCreate, CompetitionRead, CriterionRead
+from ..schemas import CategoryCreate, CategoryRead, CompetitionCreate, CompetitionRead, CriterionRead, ParticipantRead
 
 router = APIRouter(prefix="/competitions", tags=["competitions"])
 
@@ -72,6 +72,13 @@ async def get_competition(competition_id: int, db: AsyncSession = Depends(get_db
         location=event.location,
         categories=categories,
     )
+
+
+@router.get("/{competition_id}/all-participants", response_model=List[ParticipantRead])
+async def get_all_participants(competition_id: int, db: AsyncSession = Depends(get_db)):
+    """Get all participants for a competition across all categories."""
+    participants = await crud.list_all_participants_by_event(db, competition_id)
+    return [ParticipantRead.from_orm(p) for p in participants]
 
 
 @router.post("/{competition_id}/categories", response_model=CategoryRead)

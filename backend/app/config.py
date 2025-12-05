@@ -13,7 +13,7 @@ class Settings(BaseSettings):
         env="DATABASE_URL",
     )
     telegram_bot_token: str = Field("", env="TELEGRAM_BOT_TOKEN")
-    admin_link_base: str = Field("http://localhost:3000/admin", env="ADMIN_LINK_BASE")
+    admin_link_base: str = Field("http://localhost:3003/admin", env="ADMIN_LINK_BASE")
 
     class Config:
         env_file = str(Path(__file__).resolve().parents[1] / ".env")

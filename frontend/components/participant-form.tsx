@@ -31,7 +31,6 @@ export function ParticipantForm(props: Props) {
 
   const [fullName, setFullName] = useState("");
   const [number, setNumber] = useState("");
-  const [role, setRole] = useState("");
   const [gender, setGender] = useState<"male" | "female">("male");
   const [status, setStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
@@ -39,7 +38,6 @@ export function ParticipantForm(props: Props) {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editFullName, setEditFullName] = useState("");
   const [editNumber, setEditNumber] = useState("");
-  const [editRole, setEditRole] = useState("");
   const [editGender, setEditGender] = useState<"male" | "female">("male");
   const [editStatus, setEditStatus] = useState<"idle" | "saving" | "error">("idle");
   const [editError, setEditError] = useState<string | null>(null);
@@ -85,13 +83,11 @@ export function ParticipantForm(props: Props) {
         full_name: fullName.trim(),
         category_id: categoryId,
         number: number ? Number(number) : undefined,
-        role: role || undefined,
         gender,
       });
       setStatus("success");
       setFullName("");
       setNumber("");
-      setRole("");
       setGender("male");
       const updated = await fetchParticipants(competitionId, categoryId);
       setParticipants(updated);
@@ -105,7 +101,6 @@ export function ParticipantForm(props: Props) {
     setEditingId(participant.id);
     setEditFullName(`${participant.first_name} ${participant.last_name}`.trim());
     setEditNumber(participant.number?.toString() ?? "");
-    setEditRole(participant.role ?? "");
     setEditGender((participant.gender as "male" | "female") ?? "male");
     setEditStatus("idle");
     setEditError(null);
@@ -115,7 +110,6 @@ export function ParticipantForm(props: Props) {
     setEditingId(null);
     setEditFullName("");
     setEditNumber("");
-    setEditRole("");
     setEditGender("male");
     setEditStatus("idle");
     setEditError(null);
@@ -135,7 +129,6 @@ export function ParticipantForm(props: Props) {
       await updateParticipant(competitionId, editingId, {
         full_name: editFullName.trim(),
         number: editNumber ? Number(editNumber) : null,
-        role: editRole || null,
         gender: editGender,
       });
       const updated = await fetchParticipants(competitionId, categoryId);
@@ -148,13 +141,13 @@ export function ParticipantForm(props: Props) {
   };
 
   return (
-    <div className="section-card" style={{ gap: "0.75rem" }}>
+    <div className="section-card" style={{ gap: "1.5rem", padding: "2rem" }}>
       {!lockedCompetition && competitions.length === 0 && (
         <p className="text-muted">Сначала создайте соревнование.</p>
       )}
 
       {!lockedCompetition && competitions.length > 0 && (
-        <>
+        <div style={{ marginBottom: "1rem" }}>
           <label className="text-small text-muted" htmlFor="competition">
             Соревнование
           </label>
@@ -168,6 +161,8 @@ export function ParticipantForm(props: Props) {
               border: "1px solid rgba(255,255,255,0.1)",
               background: "rgba(2,6,23,0.8)",
               color: "#fff",
+              marginTop: "0.5rem",
+              padding: "0.7rem 1rem",
             }}
           >
             {competitions.map((competition) => (
@@ -176,56 +171,97 @@ export function ParticipantForm(props: Props) {
               </option>
             ))}
           </select>
-        </>
+        </div>
       )}
 
-      <label className="text-small text-muted" htmlFor="category">
-        Категория
-      </label>
-      <select
-        id="category"
-        className="glass-panel"
-        value={categoryId}
-        onChange={(event) => setCategoryId(Number(event.target.value))}
-        style={{
-          borderRadius: "1rem",
-          border: "1px solid rgba(255,255,255,0.1)",
-          background: "rgba(2,6,23,0.8)",
-          color: "#fff",
-        }}
-        disabled={categories.length === 0}
-      >
-        {categories.length === 0 ? (
-          <option>Категории отсутствуют</option>
-        ) : (
-          categories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.name}
-            </option>
-          ))
-        )}
-      </select>
+      <div className="section-grid-two" style={{ gap: "2rem", marginBottom: "0.5rem" }}>
+        <div>
+          <label className="text-small text-muted" htmlFor="fullName">
+            Имя и фамилия
+          </label>
+          <input
+            id="fullName"
+            value={fullName}
+            onChange={(event) => setFullName(event.target.value)}
+            placeholder="Иван Петров"
+            style={{
+              borderRadius: "1rem",
+              border: "1px solid rgba(255,255,255,0.1)",
+              background: "rgba(3, 7, 18, 0.8)",
+              color: "#fff",
+              padding: "0.7rem 1rem",
+              marginTop: "0.5rem",
+              width: "100%",
+            }}
+          />
+        </div>
+        <div>
+          <label className="text-small text-muted" htmlFor="category-select">
+            Категория
+          </label>
+          <select
+            id="category-select"
+            className="glass-panel"
+            value={categoryId}
+            onChange={(event) => setCategoryId(Number(event.target.value))}
+            style={{
+              borderRadius: "1rem",
+              border: "1px solid rgba(255,255,255,0.1)",
+              background: "rgba(2,6,23,0.8)",
+              color: "#fff",
+              marginTop: "0.5rem",
+              padding: "0.7rem 1rem",
+              width: "100%",
+            }}
+            disabled={categories.length === 0}
+          >
+            {categories.length === 0 ? (
+              <option>Категории отсутствуют</option>
+            ) : (
+              categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))
+            )}
+          </select>
+        </div>
+      </div>
 
-      <label className="text-small text-muted" htmlFor="fullName">
-        Имя и фамилия
-      </label>
-      <input
-        id="fullName"
-        value={fullName}
-        onChange={(event) => setFullName(event.target.value)}
-        placeholder="Иван Петров"
-        style={{
-          borderRadius: "1rem",
-          border: "1px solid rgba(255,255,255,0.1)",
-          background: "rgba(3, 7, 18, 0.8)",
-          color: "#fff",
-          padding: "0.7rem 1rem",
-        }}
-      />
-
-      <div className="section-grid-two">
-        <label className="text-small text-muted" htmlFor="number">
-          Номер (опционально)
+      <div className="section-grid-two" style={{ gap: "2rem", marginBottom: "1rem" }}>
+        <div>
+          <label className="text-small text-muted">
+            Пол
+          </label>
+          <div style={{ marginTop: "0.5rem", display: "flex", gap: "1.5rem" }}>
+            <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", cursor: "pointer" }}>
+              <input
+                type="radio"
+                name="gender"
+                value="male"
+                checked={gender === "male"}
+                onChange={() => setGender("male")}
+                style={{ cursor: "pointer", width: "18px", height: "18px" }}
+              />
+              <span>Муж</span>
+            </label>
+            <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", cursor: "pointer" }}>
+              <input
+                type="radio"
+                name="gender"
+                value="female"
+                checked={gender === "female"}
+                onChange={() => setGender("female")}
+                style={{ cursor: "pointer", width: "18px", height: "18px" }}
+              />
+              <span>Жен</span>
+            </label>
+          </div>
+        </div>
+        <div>
+          <label className="text-small text-muted" htmlFor="number">
+            Номер
+          </label>
           <input
             id="number"
             type="number"
@@ -237,58 +273,42 @@ export function ParticipantForm(props: Props) {
               background: "rgba(3, 7, 18, 0.8)",
               color: "#fff",
               padding: "0.7rem 1rem",
-              marginTop: "0.35rem",
+              marginTop: "0.5rem",
+              width: "100%",
+              maxWidth: "90px",
             }}
           />
-        </label>
-        <label className="text-small text-muted" htmlFor="role">
-          Роль
-          <input
-            id="role"
-            value={role}
-            onChange={(event) => setRole(event.target.value)}
-            placeholder="например, leader"
-            style={{
-              borderRadius: "1rem",
-              border: "1px solid rgba(255,255,255,0.1)",
-              background: "rgba(3, 7, 18, 0.8)",
-              color: "#fff",
-              padding: "0.7rem 1rem",
-              marginTop: "0.35rem",
-            }}
-          />
-        </label>
+        </div>
       </div>
 
       <button
         type="button"
         className="material-button primary"
-        style={{ width: "100%" }}
+        style={{ width: "100%", marginTop: "0.5rem", padding: "0.85rem 1.5rem", fontSize: "1rem" }}
         onClick={handleSubmit}
         disabled={status === "saving"}
       >
         {status === "saving" ? "Сохраняем..." : "Добавить участника"}
       </button>
 
-      {status === "success" && <p className="text-small" style={{ color: "#34d399" }}>Участник добавлен.</p>}
-      {status === "error" && error ? <p className="text-small" style={{ color: "#f87171" }}>{error}</p> : null}
+      {status === "success" && <p className="text-small" style={{ color: "#34d399", marginTop: "0.5rem" }}>Участник добавлен.</p>}
+      {status === "error" && error ? <p className="text-small" style={{ color: "#f87171", marginTop: "0.5rem" }}>{error}</p> : null}
 
-      <div className="glass-panel section-card">
-        <h3 className="hero-title" style={{ fontSize: "1.2rem" }}>
+      <div className="glass-panel section-card" style={{ marginTop: "2rem", padding: "2rem" }}>
+        <h3 className="hero-title" style={{ fontSize: "1.2rem", marginBottom: "1.5rem" }}>
           Участники — {categories.find((category) => category.id === categoryId)?.name ?? "Категория"}
         </h3>
         {participants.length === 0 ? (
           <p className="text-muted text-small">В этой категории пока нет участников.</p>
         ) : (
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.95rem" }}>
             <thead>
               <tr style={{ textAlign: "left", color: "#94a3b8" }}>
-                <th style={{ padding: "0.5rem 0" }}>#</th>
-                <th style={{ padding: "0.5rem 0" }}>Имя</th>
-                <th style={{ padding: "0.5rem 0" }}>Номер</th>
-                <th style={{ padding: "0.5rem 0" }}>Роль</th>
-                <th style={{ padding: "0.5rem 0" }}>Пол</th>
-                <th style={{ padding: "0.5rem 0" }}></th>
+                <th style={{ padding: "1rem 0.5rem", paddingLeft: "0" }}>#</th>
+                <th style={{ padding: "1rem 0.5rem" }}>Имя</th>
+                <th style={{ padding: "1rem 0.5rem" }}>Номер</th>
+                <th style={{ padding: "1rem 0.5rem" }}>Пол</th>
+                <th style={{ padding: "1rem 0.5rem" }}></th>
               </tr>
             </thead>
             <tbody>
@@ -296,8 +316,8 @@ export function ParticipantForm(props: Props) {
                 const isEditing = editingId === participant.id;
                 return (
                   <tr key={participant.id} style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-                    <td style={{ padding: "0.4rem 0" }}>{participant.id}</td>
-                    <td style={{ padding: "0.4rem 0" }}>
+                    <td style={{ padding: "1rem 0.5rem", paddingLeft: "0" }}>{participant.id}</td>
+                    <td style={{ padding: "1rem 0.5rem" }}>
                       {isEditing ? (
                         <input
                           value={editFullName}
@@ -308,7 +328,7 @@ export function ParticipantForm(props: Props) {
                             border: "1px solid rgba(255,255,255,0.2)",
                             background: "rgba(3, 7, 18, 0.7)",
                             color: "#fff",
-                            padding: "0.3rem 0.6rem",
+                            padding: "0.6rem 0.9rem",
                           }}
                         />
                       ) : (
@@ -317,7 +337,7 @@ export function ParticipantForm(props: Props) {
                         </>
                       )}
                     </td>
-                    <td style={{ padding: "0.4rem 0" }}>
+                    <td style={{ padding: "1rem 0.5rem" }}>
                       {isEditing ? (
                         <input
                           type="number"
@@ -325,37 +345,19 @@ export function ParticipantForm(props: Props) {
                           onChange={(event) => setEditNumber(event.target.value)}
                           style={{
                             width: "100%",
+                            maxWidth: "80px",
                             borderRadius: "0.75rem",
                             border: "1px solid rgba(255,255,255,0.2)",
                             background: "rgba(3, 7, 18, 0.7)",
                             color: "#fff",
-                            padding: "0.3rem 0.6rem",
+                            padding: "0.6rem 0.9rem",
                           }}
                         />
                       ) : (
                         participant.number ?? "—"
                       )}
                     </td>
-                    <td style={{ padding: "0.4rem 0" }}>
-                      {isEditing ? (
-                        <input
-                          value={editRole}
-                          onChange={(event) => setEditRole(event.target.value)}
-                          placeholder="роль"
-                          style={{
-                            width: "100%",
-                            borderRadius: "0.75rem",
-                            border: "1px solid rgba(255,255,255,0.2)",
-                            background: "rgba(3, 7, 18, 0.7)",
-                            color: "#fff",
-                            padding: "0.3rem 0.6rem",
-                          }}
-                        />
-                      ) : (
-                        participant.role ?? "—"
-                      )}
-                    </td>
-                    <td style={{ padding: "0.4rem 0" }}>
+                    <td style={{ padding: "1rem 0.5rem" }}>
                       {isEditing ? (
                         <div style={{ display: "flex", gap: "0.5rem" }}>
                           <label style={{ display: "flex", alignItems: "center", gap: "0.2rem" }}>
@@ -385,12 +387,12 @@ export function ParticipantForm(props: Props) {
                         "—"
                       )}
                     </td>
-                    <td style={{ padding: "0.4rem 0", minWidth: "120px" }}>
+                    <td style={{ padding: "1rem 0.5rem", minWidth: "140px" }}>
                       {isEditing ? (
-                        <div className="button-row">
+                        <div className="button-row" style={{ gap: "0.5rem" }}>
                           <button
                             className="material-button primary"
-                            style={{ padding: "0.3rem 0.8rem" }}
+                            style={{ padding: "0.5rem 1rem", fontSize: "0.9rem" }}
                             onClick={saveEdit}
                             disabled={editStatus === "saving"}
                           >
@@ -398,7 +400,7 @@ export function ParticipantForm(props: Props) {
                           </button>
                           <button
                             className="material-button secondary"
-                            style={{ padding: "0.3rem 0.8rem" }}
+                            style={{ padding: "0.5rem 1rem", fontSize: "0.9rem" }}
                             onClick={cancelEdit}
                           >
                             Отмена
@@ -407,7 +409,7 @@ export function ParticipantForm(props: Props) {
                       ) : (
                         <button
                           className="material-button secondary"
-                          style={{ padding: "0.3rem 0.8rem" }}
+                          style={{ padding: "0.5rem 1rem", fontSize: "0.9rem" }}
                           onClick={() => startEdit(participant)}
                         >
                           Изменить

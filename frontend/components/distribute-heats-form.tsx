@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import {
@@ -29,6 +30,7 @@ type Props =
   | { competitions: Competition[]; competition?: never };
 
 export function DistributeHeatsForm(props: Props) {
+  const router = useRouter();
   const competitions = useMemo(
     () => (props.competition ? [props.competition] : props.competitions ?? []),
     [props.competition, props.competitions],
@@ -127,6 +129,9 @@ export function DistributeHeatsForm(props: Props) {
       setMessage(
         `Раунд #${round.id}: создано заходов ${response?.heats_created ?? "неизвестно"}.`,
       );
+
+      // Refresh the page to show updated heats
+      router.refresh();
     } catch (error) {
       setStatus("error");
       setMessage(error instanceof Error ? error.message : "Ошибка распределения.");

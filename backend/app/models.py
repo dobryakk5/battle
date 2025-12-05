@@ -101,7 +101,9 @@ class Heat(Base):
     status: Mapped[str] = mapped_column(String(32), nullable=False, default="waiting")
 
     round: Mapped["Round"] = relationship("Round", back_populates="heats")
-    participants: Mapped[List["HeatParticipant"]] = relationship("HeatParticipant", back_populates="heat")
+    participants: Mapped[List["HeatParticipant"]] = relationship(
+        "HeatParticipant", back_populates="heat", cascade="all, delete-orphan"
+    )
 
     __table_args__ = (
         UniqueConstraint("round_id", "heat_number", name="uq_round_heat"),

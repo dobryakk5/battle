@@ -1,7 +1,7 @@
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -120,3 +120,63 @@ async def create_manual_heat(
     )
     created_heat = (await db.execute(stmt_heat)).scalar_one()
     return build_heat_response(created_heat)
+
+
+@router.put("/{round_id}/heats/{heat_id}", response_model=HeatRead)
+async def update_manual_heat(
+    round_id: int,
+    heat_id: int,
+    payload: ManualHeatCreate,
+    db: AsyncSession = Depends(get_db),
+):
+    if not payload.participant_ids:
+        raise HTTPException(status_code=400, detail="Добавьте хотя бы одного участника")
+
+    round_obj = await crud.get_round(db, round_id=round_id)
+
+    stmt_heat = select(models.Heat).filter(models.Heat.id == heat_id, models.Heat.round_id == round_id)
+    heat = (await db.execute(stmt_heat)).scalar_one_or_none()
+    if heat is None:
+        raise HTTPException(status_code=404, detail="Заход не найден")
+
+    stmt_participants = (
+        select(models.Participant)
+        .filter(models.Participant.id.in_(payload.participant_ids))
+        .order_by(models.Participant.id)
+    )
+    result = await db.execute(stmt_participants)
+    participants = result.scalars().all()
+    if len(participants) != len(set(payload.participant_ids)):
+        raise HTTPException(status_code=404, detail="Участник не найден")
+    for participant in participants:
+        if participant.category_id != round_obj.category_id:
+            raise HTTPException(status_code=400, detail="Участник не относится к выбранной категории")
+
+    await db.execute(
+        delete(models.HeatParticipant).where(models.HeatParticipant.heat_id == heat_id)
+    )
+    for participant_id in payload.participant_ids:
+        db.add(models.HeatParticipant(heat_id=heat_id, participant_id=participant_id))
+    await db.commit()
+
+    stmt_heat = (
+        select(models.Heat)
+        .options(selectinload(models.Heat.participants).selectinload(models.HeatParticipant.participant))
+        .filter(models.Heat.id == heat_id)
+    )
+    updated_heat = (await db.execute(stmt_heat)).scalar_one()
+    return build_heat_response(updated_heat)
+
+
+@router.delete("/{round_id}/heats/{heat_id}", status_code=204)
+async def delete_heat(round_id: int, heat_id: int, db: AsyncSession = Depends(get_db)):
+    stmt = (
+        select(models.Heat)
+        .options(selectinload(models.Heat.participants))
+        .filter(models.Heat.id == heat_id, models.Heat.round_id == round_id)
+    )
+    heat = (await db.execute(stmt)).scalar_one_or_none()
+    if heat is None:
+        raise HTTPException(status_code=404, detail="Заход не найден")
+    await db.delete(heat)
+    await db.commit()

@@ -1,9 +1,11 @@
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
-from .. import crud
+from .. import crud, models
 from ..database import get_db
 from ..schemas import ParticipantCreate, ParticipantRead, ParticipantUpdate
 

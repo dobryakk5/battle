@@ -40,9 +40,6 @@ export default async function BattlePage({ params }: BattlePageProps) {
       </div>
 
       <nav className="glass-panel section-card" style={{ display: "flex", gap: "0.75rem" }}>
-        <a className="material-button secondary" href="#categories">
-          Категории
-        </a>
         <a className="material-button secondary" href="#participants">
           Участники
         </a>
@@ -50,6 +47,7 @@ export default async function BattlePage({ params }: BattlePageProps) {
           Заходы
         </a>
       </nav>
+
       <a
         href="/judge"
         target="_blank"
@@ -62,6 +60,20 @@ export default async function BattlePage({ params }: BattlePageProps) {
         }}
       >
         Судья → открыть журнал судьи
+      </a>
+
+      <a
+        href={`/spectator/${competitionId}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          color: "#818cf8",
+          fontWeight: 600,
+          textDecoration: "none",
+          alignSelf: "flex-start",
+        }}
+      >
+        Зритель → открыть режим просмотра
       </a>
 
       <section id="categories" className="material-card section-card">
@@ -81,7 +93,7 @@ export default async function BattlePage({ params }: BattlePageProps) {
       <section id="heats" className="material-card section-card">
         <div className="section-meta">
           <h2 className="hero-title" style={{ fontSize: "1.6rem" }}>
-            Распределить заходы
+            Авто распределение заходов
           </h2>
           <span className="chip">Раунд</span>
         </div>
@@ -124,39 +136,45 @@ export default async function BattlePage({ params }: BattlePageProps) {
                   </div>
                   {heats.length === 0 ? (
                     <p className="text-small text-muted">
-                      Для этого раунда ещё нет заходов. Нажмите «Распределить заходы».
+                      Для этого раунда ещё нет заходов. Нажмите «Авто распределение заходов».
                     </p>
                   ) : (
                     <div className="section-grid-two" style={{ width: "100%" }}>
                       {heats.map((heat) => (
-                        <div key={heat.id} className="glass-panel" style={{ padding: "0.75rem", borderRadius: "1rem" }}>
-                          <div className="section-meta">
-                            <div>
-                              <h4 className="hero-title" style={{ fontSize: "1rem" }}>
-                                Заход {heat.heat_number}
-                              </h4>
-                              <p className="text-small text-muted">ID {heat.id}</p>
+                        <Link
+                          key={heat.id}
+                          href={`/battle/${competitionId}/round/${round.id}/manual/${heat.id}`}
+                          style={{ textDecoration: "none", color: "inherit", display: "block" }}
+                        >
+                          <div className="glass-panel clickable" style={{ padding: "0.75rem", borderRadius: "1rem" }}>
+                            <div className="section-meta">
+                              <div>
+                                <h4 className="hero-title" style={{ fontSize: "1rem" }}>
+                                  Заход {heat.heat_number}
+                                </h4>
+                                <p className="text-small text-muted">ID {heat.id}</p>
+                              </div>
+                              <span className={`chip ${heat.status === "in_progress" ? "chip-live" : ""}`}>
+                                {heat.status === "finished"
+                                  ? "Завершён"
+                                  : heat.status === "in_progress"
+                                    ? "В процессе"
+                                    : "Ожидает"}
+                              </span>
                             </div>
-                            <span className={`chip ${heat.status === "in_progress" ? "chip-live" : ""}`}>
-                              {heat.status === "finished"
-                                ? "Завершён"
-                                : heat.status === "in_progress"
-                                  ? "В процессе"
-                                  : "Ожидает"}
-                            </span>
+                            {heat.participants.length === 0 ? (
+                              <p className="text-small text-muted">Нет участников</p>
+                            ) : (
+                              <ul className="text-small" style={{ paddingLeft: "1.2rem", margin: 0 }}>
+                                {heat.participants.map((participant) => (
+                                  <li key={participant.participant_id} style={{ marginBottom: "0.3rem" }}>
+                                    {participant.participant_name}
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
                           </div>
-                          {heat.participants.length === 0 ? (
-                            <p className="text-small text-muted">Нет участников</p>
-                          ) : (
-                            <ul className="text-small" style={{ paddingLeft: "1.2rem", margin: 0 }}>
-                              {heat.participants.map((participant) => (
-                                <li key={participant.participant_id} style={{ marginBottom: "0.3rem" }}>
-                                  {participant.participant_name}
-                                </li>
-                              ))}
-                            </ul>
-                          )}
-                        </div>
+                        </Link>
                       ))}
                     </div>
                   )}

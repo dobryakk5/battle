@@ -32,7 +32,7 @@ export default async function AdminPage() {
             <div>
               <p className="tagline">API</p>
               <h2 className="hero-title" style={{ fontSize: "1.8rem" }}>
-                Распределить заходы
+                Авто распределение заходов
               </h2>
             </div>
             <span className="chip">Раунд</span>

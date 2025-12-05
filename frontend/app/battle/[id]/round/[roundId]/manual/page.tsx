@@ -33,11 +33,15 @@ export default async function ManualHeatPage({ params }: ManualHeatPageProps) {
         </div>
         <p className="text-muted text-small">
           Выберите участников из общего списка и добавьте их в новый заход. По сохранении заход автоматически
-          появится в блоке «Распределение по заходам».
+          появится в блоке «Авто распределение заходов».
         </p>
       </section>
 
-      <ManualHeatBuilder roundId={roundId} participants={participants} />
+      <ManualHeatBuilder
+        roundId={roundId}
+        competitionId={competitionId}
+        participants={participants}
+      />
     </div>
   );
 }

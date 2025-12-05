@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import func, select
+from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from . import models
@@ -9,6 +9,7 @@ from .routers import (
     competitions,
     health,
     heats,
+    participant_stats,
     participants,
     rounds,
     scores,
@@ -28,6 +29,7 @@ app.add_middleware(
 app.include_router(health.router)
 app.include_router(competitions.router)
 app.include_router(participants.router)
+app.include_router(participant_stats.router)
 app.include_router(rounds.router)
 app.include_router(heats.router)
 app.include_router(scores.router)
@@ -54,6 +56,7 @@ async def seed_default_judge(async_session: AsyncSession) -> None:
 async def create_tables() -> None:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        await conn.execute(text("ALTER TABLE participants ADD COLUMN IF NOT EXISTS gender VARCHAR(16)"))
 
     async with AsyncSessionLocal() as session:
         await seed_default_judge(session)

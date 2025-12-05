@@ -204,6 +204,23 @@ export async function createManualHeat(roundId: number, participantIds: number[]
   });
 }
 
+export async function updateManualHeat(
+  roundId: number,
+  heatId: number,
+  participantIds: number[],
+): Promise<Heat> {
+  return request<Heat>(`/rounds/${roundId}/heats/${heatId}`, {
+    method: "PUT",
+    body: JSON.stringify({ participant_ids: participantIds }),
+  });
+}
+
+export async function deleteHeat(roundId: number, heatId: number): Promise<void> {
+  await request<void>(`/rounds/${roundId}/heats/${heatId}`, {
+    method: "DELETE",
+  });
+}
+
 export async function fetchScoresForHeat(heatId: number): Promise<Score[]> {
   return request<Score[]>(`/scores/heats/${heatId}`);
 }
@@ -258,4 +275,45 @@ export async function submitScore(payload: ScorePayload) {
     method: "POST",
     body: JSON.stringify(payload),
   });
+}
+
+export type ScoreDetail = {
+  id: number;
+  score: number;
+  judge_name: string;
+  criterion_name: string | null;
+  round_id: number;
+  heat_id: number | null;
+};
+
+export type HeatDetailStats = {
+  id: number;
+  heat_number: number;
+  status: HeatStatus;
+  round_id: number;
+  round_type: string;
+  stage_format: string | null;
+  category_name: string;
+  event_title: string;
+};
+
+export type ParticipantStats = {
+  id: number;
+  first_name: string;
+  last_name: string;
+  number: number | null;
+  role: string | null;
+  gender: string | null;
+  category_id: number;
+  category_name: string;
+  event_id: number;
+  event_title: string;
+  event_date: string | null;
+  event_location: string | null;
+  scores: ScoreDetail[];
+  heats: HeatDetailStats[];
+};
+
+export async function fetchParticipantStats(participantId: number): Promise<ParticipantStats> {
+  return request<ParticipantStats>(`/participants/${participantId}`);
 }

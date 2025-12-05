@@ -72,5 +72,39 @@ The bot pulls judges from `GET /users/me?telegram_id={id}` and shows top competi
 3. Add unit/integration tests for heat distribution, score aggregation, and bot handlers.
 
 
+DEPLOY
+
 kill api
 lsof -ti:8000
+
+.env - для локальной разработки (в .gitignore, не коммитится)
+.env.production - для production (коммитится в git)
+Инструкция по установке на свой сервер:
+1. На сервере установите зависимости и соберите:
+cd /path/to/battle/frontend
+npm install
+npm run build
+2. Запустите Next.js в production режиме:
+Вариант A - Напрямую:
+npm start
+# Или на другом порту:
+PORT=3003 npm start
+Вариант B - С PM2 (рекомендую):
+npm install -g pm2
+pm2 start npm --name "battle-frontend" -- start
+pm2 save
+pm2 startup  # для автозапуска
+3. Убедитесь что FastAPI тоже запущен:
+cd /path/to/battle/backend
+source ../.venv/bin/activate
+uvicorn app.main:app --host 0.0.0.0 --port 8000
+Важно для production:
+Если Frontend и Backend на разных серверах, тогда в .env.production измените:
+BACKEND_URL=http://ip-адрес-backend-сервера:8000
+# Или
+BACKEND_URL=http://backend.your-domain.com
+Проверка:
+После деплоя проверьте в браузере:
+Откройте DevTools → Network
+Создайте соревнование
+Должен быть запрос к /api/competitions, который Next.js перенаправит на ваш backend
